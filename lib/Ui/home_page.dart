@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
@@ -46,7 +47,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 20),
             Expanded(
                 child:SingleChildScrollView(
-                  child: Text(
+                  child: GptMarkdown(
                     bodyTextMessage
                   ),
                 ),
