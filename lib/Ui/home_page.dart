@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
@@ -14,11 +15,11 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  // Chat messages (role = "user" or "ai")
+  // Chat messages
   List<Map<String, String>> messages = [];
 
   Future<void> getResponse(String query) async {
-    const String apiKey = "AIzaSyAohznfnNbj-R6yvNGU89UNQGzrUKeMp7k"; // 🔒 Replace with your key
+    const String apiKey = "AIzaSyAohznfnNbj-R6yvNGU89UNQGzrUKeMp7k"; // 🔒 Replace with your Gemini key
     final String url =
         "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey";
 
@@ -46,13 +47,10 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           messages.add({"role": "ai", "text": output});
         });
-        _scrollToBottom(); // 👈 Auto scroll
+        _scrollToBottom();
       } else {
         setState(() {
-          messages.add({
-            "role": "ai",
-            "text": "❌ Error ${res.statusCode}: ${res.body}"
-          });
+          messages.add({"role": "ai", "text": "❌ Error ${res.statusCode}: ${res.body}"});
         });
         _scrollToBottom();
       }
@@ -95,10 +93,10 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(title: const Text("AI Chat")),
       body: Column(
         children: [
-          // Chat messages list
+          // Messages
           Expanded(
             child: ListView.builder(
-              controller: _scrollController, // 👈 Added controller
+              controller: _scrollController,
               padding: const EdgeInsets.all(12),
               itemCount: messages.length,
               itemBuilder: (context, index) {
@@ -106,8 +104,7 @@ class _HomePageState extends State<HomePage> {
                 final isUser = msg["role"] == "user";
 
                 return Align(
-                  alignment:
-                  isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
                     margin: const EdgeInsets.symmetric(vertical: 6),
                     padding: const EdgeInsets.all(12),
@@ -117,21 +114,15 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: isUser
-                        ? Text(
-                      msg["text"] ?? "",
-                      style: const TextStyle(fontSize: 16),
-                    )
-                        : GptMarkdown(
-                      msg["text"] ?? "",
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                        ? Text(msg["text"] ?? "", style: const TextStyle(fontSize: 16))
+                        : TypingText(msg["text"] ?? ""),
                   ),
                 );
               },
             ),
           ),
 
-          // Input field
+          // Input
           Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
@@ -159,5 +150,50 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
+  }
+}
+
+/// Typing animation widget
+class TypingText extends StatefulWidget {
+  final String text;
+  const TypingText(this.text, {super.key});
+
+  @override
+  State<TypingText> createState() => _TypingTextState();
+}
+
+class _TypingTextState extends State<TypingText> {
+  String displayedText = "";
+  int _index = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTyping();
+  }
+
+  void _startTyping() {
+    _timer = Timer.periodic(const Duration(milliseconds: 30), (timer) {
+      if (_index < widget.text.length) {
+        setState(() {
+          displayedText += widget.text[_index];
+          _index++;
+        });
+      } else {
+        _timer?.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GptMarkdown(displayedText, style: const TextStyle(fontSize: 16));
   }
 }
