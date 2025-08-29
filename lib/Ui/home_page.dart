@@ -86,7 +86,8 @@ class _HomePageState extends State<HomePage> {
 
     if(res.statusCode == 200){
       // print(res.body);
-      bodyTextMessage = jsonDecode(res.body).toString();
+      var data = jsonDecode(res.body);
+      bodyTextMessage = data['candidates'][0]["content"]['parts'][0]['text'];
       print(bodyTextMessage);
       setState(() {
         bodyTextMessage;
