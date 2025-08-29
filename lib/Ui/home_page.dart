@@ -12,51 +12,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController searchController = TextEditingController();
   String response = '';
-
-  // Future<void> getResponse() async {
-  //   const String apiKey = "AIzaSyAohznfnNbj-R6yvNGU89UNQGzrUKeMp7k"; // 🔒 Replace with your Gemini key
-  //   final String url =
-  //       "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey";
-  //
-  //   Map<String, dynamic> bodyParams = {
-  //     "contents": [
-  //       {
-  //         "parts": [
-  //           {"text": searchController.text}
-  //         ]
-  //       }
-  //     ]
-  //   };
-  //
-  //   try {
-  //     final res = await http.post(
-  //       Uri.parse(url),
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: jsonEncode(bodyParams),
-  //     );
-  //
-  //     if (res.statusCode == 200) {
-  //       final data = jsonDecode(res.body);
-  //       final output = data["candidates"]?[0]["content"]?["parts"]?[0]?["text"] ?? "No response";
-  //       setState(() {
-  //         response = output;
-  //       });
-  //     } else {
-  //       print(res.statusCode);
-  //       print(res.body);
-  //       setState(() {
-  //         response = "Error: ${res.statusCode} → ${res.body}";
-  //       });
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //     setState(() {
-  //       response = "Exception: $e";
-  //     });
-  //   }
-  // }
+  String bodyTextMessage = '';
 
   @override
   Widget build(BuildContext context) {
@@ -78,22 +34,24 @@ class _HomePageState extends State<HomePage> {
             ),
             const SizedBox(height: 12),
             ElevatedButton(
+
               onPressed: () {
                 if (searchController.text.isNotEmpty) {
                   getResponse();
                 }
               },
               child: const Text("Send"),
+
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: SingleChildScrollView(
-                child: Text(
-                  response,
-                  style: const TextStyle(fontSize: 18),
+                child:SingleChildScrollView(
+                  child: Text(
+                    bodyTextMessage
+                  ),
                 ),
-              ),
             ),
+
           ],
         ),
       ),
@@ -127,7 +85,15 @@ class _HomePageState extends State<HomePage> {
     );
 
     if(res.statusCode == 200){
-      print(res.body);
+      // print(res.body);
+      bodyTextMessage = jsonDecode(res.body).toString();
+      print(bodyTextMessage);
+      setState(() {
+        bodyTextMessage;
+      });
+    }
+    else{
+      print(res.statusCode);
     }
   }
 
