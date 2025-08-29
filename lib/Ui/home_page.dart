@@ -129,7 +129,17 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       // App bar title
-      appBar: AppBar(title: const Text("AI Chat")),
+      appBar: AppBar(title: Center(
+
+        child: const Text("AI Chat",
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 26,
+        ),
+        ),
+      ),
+          backgroundColor: Colors.deepPurpleAccent.shade700
+      ),
       body: Column(
         children: [
           // Chat message list
