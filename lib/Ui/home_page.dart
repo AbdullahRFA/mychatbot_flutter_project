@@ -26,12 +26,11 @@ class _HomePageState extends State<HomePage> {
 
   // Function to call Gemini API and fetch AI response
   Future<void> getResponse(String query) async {
-    // Gemini API Key (⚠️ Replace with your actual key securely)
-    const String apiKey = "AIzaSyAohznfnNbj-R6yvNGU89UNQGzrUKeMp7k";
+    // Gemini API Key (Replace with your actual key securely)
+    const String apiKey = "Replace your_api_key_here";
 
     // API endpoint (Gemini generateContent)
-    final String url =
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey";
+    final String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$apiKey";
 
     // Request body containing user message
     Map<String, dynamic> bodyParams = {
@@ -62,7 +61,7 @@ class _HomePageState extends State<HomePage> {
         // Parse JSON response
         final data = jsonDecode(res.body);
 
-        // Extract AI's response text (fallback to "⚠️ No response" if null)
+        // Extract AI's response text (fallback to " No response" if null)
         final output = data["candidates"]?[0]["content"]?["parts"]?[0]?["text"] ?? "⚠️ No response";
 
         // Add AI response to messages
