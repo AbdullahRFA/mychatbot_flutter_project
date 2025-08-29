@@ -12,6 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   // Chat messages (role = "user" or "ai")
   List<Map<String, String>> messages = [];
@@ -45,6 +46,7 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           messages.add({"role": "ai", "text": output});
         });
+        _scrollToBottom(); // 👈 Auto scroll
       } else {
         setState(() {
           messages.add({
@@ -52,11 +54,13 @@ class _HomePageState extends State<HomePage> {
             "text": "❌ Error ${res.statusCode}: ${res.body}"
           });
         });
+        _scrollToBottom();
       }
     } catch (e) {
       setState(() {
         messages.add({"role": "ai", "text": "⚠️ Exception: $e"});
       });
+      _scrollToBottom();
     }
   }
 
@@ -68,8 +72,21 @@ class _HomePageState extends State<HomePage> {
       messages.add({"role": "user", "text": text});
       searchController.clear();
     });
+    _scrollToBottom();
 
     getResponse(text);
+  }
+
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -81,6 +98,7 @@ class _HomePageState extends State<HomePage> {
           // Chat messages list
           Expanded(
             child: ListView.builder(
+              controller: _scrollController, // 👈 Added controller
               padding: const EdgeInsets.all(12),
               itemCount: messages.length,
               itemBuilder: (context, index) {
